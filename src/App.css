@@ -3,6 +3,8 @@
 
   display: flex;
   flex-flow: row nowrap;
+
+  max-width: 100vw;
 }
 
 /* --------------- */
@@ -23,6 +25,69 @@
     flex-flow: row; */
   } /* a */
 } /* #sidebar */
+
+/* ------------ */
+/* --- Page --- */
+/* ------------ */
+
+.page {
+  flex-grow: 1;
+  overflow: auto;
+} /* .page */
+
+/* ------------- */
+/* --- Table --- */
+/* ------------- */
+
+div.MuiPaper-root:has(table) {
+  & div.MuiBox-root {
+  } /* div.MuiBox-root */
+  & div.MuiTableContainer-root {
+    & table.MuiTable-root {
+      & thead.MuiTableHead-root {
+      } /* thead.MuiTableHead-root */
+      & tbody.MuiTableBody-root {
+      } /* tbody.MuiTableBody-root */
+    } /* table.MuiTable-root */
+  } /* div.MuiTableContainer-root */
+} /* .div.MuiPaper-root */
+
+/* --------------------- */
+/* --- Table Filters --- */
+/* --------------------- */
+/* Date Picker : Min and Max */
+& .MuiBox-root:has(.MuiPickersSectionList-root) {
+  & .MuiPickersTextField-root {
+    &:first-of-type {
+      & .MuiPickersInputBase-root::before {
+        content: "Min";
+      }
+    }
+    &:nth-of-type(2) {
+      & .MuiPickersInputBase-root::before {
+        content: "Max";
+      }
+    }
+    & .MuiPickersInputBase-root {
+      &::before {
+        padding-bottom: 0.25rem;
+        color: rgba(0, 0, 0, 0.42)
+      }
+      & .MuiPickersSectionList-root {
+        color: transparent;
+      }
+      &:focus-within, &:not(:has(span[aria-valuetext="Empty"])) {
+        &::before {
+          color: transparent;
+        }
+        & .MuiPickersSectionList-root {
+          color: rgba(0, 0, 0, 0.87);
+        }
+      }
+    } /* .MuiPickersInputBase-root */
+  } /* .MuiPickersTextField-root */
+} /* .MuiBox-root */
+
 
 .page {
   flex-grow: 1;

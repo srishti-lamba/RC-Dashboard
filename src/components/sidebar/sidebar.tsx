@@ -120,7 +120,7 @@ function Sidebar({} : SidebarProps) {
                 ))
             }
         </List>
-        <Divider />
+        {/* <Divider />
         <List>
           {['All mail', 'Trash', 'Spam'].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
@@ -171,7 +171,7 @@ function Sidebar({} : SidebarProps) {
               </ListItemButton>
             </ListItem>
           ))}
-        </List>
+        </List> */}
       </Drawer>
     )
 }

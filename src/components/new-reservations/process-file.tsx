@@ -1,42 +1,6 @@
 import { Date as ExcelDate, readSheet } from 'read-excel-file/browser'
-
-export interface NewReservationsType {
-    confirmationNumber : number;
-    firstName : string;
-    lastName : string;
-    status : string;
-    shareWith : number|null;
-    arrivalDate : Date;
-    departureDate : Date;
-    nightsStayed : number;
-    rateCode: string;
-    roomRate: number;
-    roomType: string;
-    dateCreated : Date;
-    marketSegment : string;
-    guestType : string;
-    source : string;
-    revenue : number; 
-}
-
-interface DataNamesType {
-    confirmationNumber : string;
-    firstName : string;
-    lastName : string;
-    status : string;
-    shareWith : string;
-    arrivalDate : string;
-    departureDate : string;
-    nightsStayed : string;
-    rateCode: string;
-    roomRate: string;
-    roomType: string;
-    dateCreated : string;
-    marketSegment : string;
-    guestType : string;
-    source : string;
-    revenue : string; 
-}
+import { ReservationsType } from '../../utils/interfaces';
+import { reservationAttributeToRawNames as attrToRaw } from '../../utils/constants';
 
 interface ProcessFileProps {
     selectedFile : any,
@@ -44,43 +8,6 @@ interface ProcessFileProps {
 }
 
 function ProcessFile({selectedFile, setData} : ProcessFileProps) {
-
-    // const rawToDisplayNames = {
-    //     "guestnum" : "Confirmation Number", 
-    //     "guestname" : "Guest Name", 
-    //     "status" : "Status", 
-    //     "sharew/ #" : "Sharewith", 
-    //     "arrivedate" : "Arrival Date", 
-    //     "departdate" : "Departure Date", 
-    //     "Nightsd" : "Nights Stayed", 
-    //     "ratesched" : "Rate Code", 
-    //     "roomrate" : "Room Rate", 
-    //     "accomcode" : "Room Type", 
-    //     "datecreate" : "Date Created", 
-    //     "marketseg" : "Market Segment", 
-    //     "guesttype" : "Guest Type", 
-    //     "source" : "Source", 
-    //     "Revenue" : "Revenue"
-    // }
-
-    const attributeToRawNames : DataNamesType = {
-        confirmationNumber: "guestnum",
-        firstName: "guestname",
-        lastName: "guestname",
-        status: "status",
-        shareWith: "sharew/ #",
-        arrivalDate: "arrivedate",
-        departureDate: "departdate",
-        nightsStayed: "Nightsd",
-        rateCode: "ratesched",
-        roomRate: "roomrate",
-        roomType: "accomcode",
-        dateCreated: "datecreate",
-        marketSegment: "marketseg",
-        guestType: "guesttype",
-        source: "source",
-        revenue: "Revenue"
-    }
 
     async function onProcessFile(event : any) {
 		let arrayData = await readSheet(selectedFile);
@@ -106,16 +33,16 @@ function ProcessFile({selectedFile, setData} : ProcessFileProps) {
         // -----------------
         // --- Fill Data ---
         // -----------------
-        var data : NewReservationsType[] = []
+        var data : ReservationsType[] = []
         for (rowIndex; rowIndex < arrayData.length ; rowIndex++) {
             let rowArr = arrayData[rowIndex];
 
             // If dummy row, skip
-            if (rowArr[header[attributeToRawNames.confirmationNumber]] == "G")
+            if (rowArr[header[attrToRaw.confirmationNumber]] == "G")
                 continue
 
             let dummyDate = new Date(1999, 0, 1);
-            let rowObj : NewReservationsType = {
+            let rowObj : ReservationsType = {
                 confirmationNumber: 0, firstName: "", lastName: "",
                 status: "", shareWith: null, nightsStayed: 0,
                 arrivalDate: dummyDate, departureDate: dummyDate, dateCreated: dummyDate, 
@@ -135,16 +62,20 @@ function ProcessFile({selectedFile, setData} : ProcessFileProps) {
             }
             const getDate = (rawName : string) => {
                 if (header[rawName] !== undefined)
-                    return new Date((rowArr[header[rawName]] as ExcelDate).toString());
+                {
+                    let newDate = new Date((rowArr[header[rawName]] as ExcelDate).toString())
+                    newDate.setHours(0, 0, 0, 0)
+                    return newDate;
+                }
                 return dummyDate
             }
 
             // Confirmation Number
-            rowObj.confirmationNumber = getNumber(attributeToRawNames.confirmationNumber);
+            rowObj.confirmationNumber = getNumber(attrToRaw.confirmationNumber);
 
             // Name
-            if (header[attributeToRawNames.firstName] !== undefined) {
-                let name = rowArr[header[attributeToRawNames.firstName]];
+            if (header[attrToRaw.firstName] !== undefined) {
+                let name = rowArr[header[attrToRaw.firstName]];
                 if (typeof name !== 'string')
                     continue;
                 
@@ -160,19 +91,19 @@ function ProcessFile({selectedFile, setData} : ProcessFileProps) {
                     rowObj.firstName = nameSplit[1]
             }
 
-            rowObj.status = getString(attributeToRawNames.status);
-            rowObj.shareWith = getNumber(attributeToRawNames.shareWith);
-            rowObj.arrivalDate = getDate(attributeToRawNames.arrivalDate);
-            rowObj.departureDate = getDate(attributeToRawNames.departureDate);
-            rowObj.nightsStayed = getNumber(attributeToRawNames.nightsStayed);
-            rowObj.rateCode = getString(attributeToRawNames.rateCode);
-            rowObj.roomRate = getNumber(attributeToRawNames.roomRate);
-            rowObj.roomType = getString(attributeToRawNames.roomType);
-            rowObj.dateCreated = getDate(attributeToRawNames.dateCreated);
-            rowObj.marketSegment = getString(attributeToRawNames.marketSegment);
-            rowObj.guestType = getString(attributeToRawNames.guestType);
-            rowObj.source = getString(attributeToRawNames.source);
-            rowObj.revenue = getNumber(attributeToRawNames.revenue);
+            rowObj.status        = getString(attrToRaw.status);
+            rowObj.shareWith     = getNumber(attrToRaw.shareWith);
+            rowObj.arrivalDate   = getDate  (attrToRaw.arrivalDate);
+            rowObj.departureDate = getDate  (attrToRaw.departureDate);
+            rowObj.nightsStayed  = getNumber(attrToRaw.nightsStayed);
+            rowObj.rateCode      = getString(attrToRaw.rateCode);
+            rowObj.roomRate      = getNumber(attrToRaw.roomRate);
+            rowObj.roomType      = getString(attrToRaw.roomType);
+            rowObj.dateCreated   = getDate  (attrToRaw.dateCreated);
+            rowObj.marketSegment = getString(attrToRaw.marketSegment);
+            rowObj.guestType     = getString(attrToRaw.guestType);
+            rowObj.source        = getString(attrToRaw.source);
+            rowObj.revenue       = getNumber(attrToRaw.revenue);
 
             data.push(rowObj);
         }

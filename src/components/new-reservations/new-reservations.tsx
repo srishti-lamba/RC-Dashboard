@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import UploadFile from "./upload";
-import ProcessFile, { NewReservationsType } from "./process-file";
+import ProcessFile from "./process-file";
 import Table from "./table";
+import { ReservationsType } from "../../utils/interfaces";
 
 function NewReservations() {
 
     const [selectedFile, setSelectedFile] = useState(null);
-    const [data, setData] = useState<NewReservationsType[]>([]);
+    const [data, setData] = useState<ReservationsType[]>([]);
 
     // useEffect(() => {
     //     console.log(selectedFile)
