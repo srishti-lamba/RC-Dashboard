@@ -6,6 +6,8 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AllReservations from "../all-reservations/all-reservations";
+import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
+import Duplicates from "../duplicates/duplicates";
 
 // https://mui.com/material-ui/material-icons/?theme=Rounded
 
@@ -34,5 +36,11 @@ export const ROUTES : routeType[] = [
     element: <NewReservations />,
     name: "New Reservations",
     icon: <PersonAddRoundedIcon />
+  },
+  {
+    path: "/Duplicates",
+    element: <Duplicates />,
+    name: "Duplicates",
+    icon: <GroupRoundedIcon />
   },
 ];

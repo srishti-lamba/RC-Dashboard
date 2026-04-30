@@ -33,6 +33,14 @@
 .page {
   flex-grow: 1;
   overflow: auto;
+
+  h1 {
+    background-color: slategray;
+    color: whitesmoke;
+    margin: 0;
+    margin-bottom: 0.5em;
+    padding: 0.5em 0;
+  } /* h1 */
 } /* .page */
 
 /* ------------- */
@@ -45,6 +53,34 @@ div.MuiPaper-root:has(table) {
   & div.MuiTableContainer-root {
     & table.MuiTable-root {
       & thead.MuiTableHead-root {
+        & th.MuiTableCell-root {
+          & div.Mui-TableHeadCell-Content {
+            flex-direction: column-reverse;
+            & div.Mui-TableHeadCell-Content-Labels {
+              width: 100%;
+              justify-content: space-between;
+            } /* div.Mui-TableHeadCell-Content-Labels */
+            & div.Mui-TableHeadCell-Content-Actions {
+              margin-left: auto;
+              /* display: flex;
+              align-items: center;
+              flex-flow: row nowrap;
+              width: 100%;
+              & > button:first-of-type {
+                flex-grow: 1;
+              }
+              & > button:last-of-type {
+                flex-grow: 0;
+              } */
+            } /* div.Mui-TableHeadCell-Content-Actions */
+            & div.Mui-TableHeadCell-ResizeHandle-Wrapper {
+              height: 100%;
+              & div.Mui-TableHeadCell-ResizeHandle-Divider {
+                height: 100%;
+              } /* div.Mui-TableHeadCell-ResizeHandle-Divider */
+            } /* div.Mui-TableHeadCell-ResizeHandle-Wrapper */
+          } /* div.Mui-TableHeadCell-Content */
+        } /* th.MuiTableCell-root */
       } /* thead.MuiTableHead-root */
       & tbody.MuiTableBody-root {
       } /* tbody.MuiTableBody-root */

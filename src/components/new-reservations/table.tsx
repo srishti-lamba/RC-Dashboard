@@ -179,6 +179,12 @@ table.current = useMaterialReactTable({
     initialState: { density: 'compact' },
     positionToolbarAlertBanner: 'none',
     enableColumnFilterModes: true,
+    muiTableProps: {
+        // size: "small",
+    },
+    defaultColumn: {
+        size: 100
+    },
     // columnFilterDisplayMode: 'popover',
     // filterFns: {
     //   customFilterFn: (row, id, filterValue) => {

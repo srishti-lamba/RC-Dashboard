@@ -18,6 +18,7 @@ function NewReservations() {
 
     return (
         <div className="page">
+            <h1>New Reservations</h1>
             <UploadFile setSelectedFile={setSelectedFile} />
             <ProcessFile selectedFile={selectedFile} setData={setData} />
             <Table data={data} />

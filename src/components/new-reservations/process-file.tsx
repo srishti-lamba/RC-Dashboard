@@ -1,6 +1,7 @@
 import { Date as ExcelDate, readSheet } from 'read-excel-file/browser'
 import { ReservationsType } from '../../utils/interfaces';
 import { reservationAttributeToRawNames as attrToRaw } from '../../utils/constants';
+import Database from '../../utils/database';
 
 interface ProcessFileProps {
     selectedFile : any,
@@ -109,6 +110,14 @@ function ProcessFile({selectedFile, setData} : ProcessFileProps) {
         }
 
         setData(data);
+
+        // -----------------------
+        // --- Update Database ---
+        // -----------------------
+
+        const db = new Database('rc-dashboard');
+        await db.createObjectStore_newReservations();
+        await db.putBulkValue_reservations('newReservations', data);
 	};
 
     return (
