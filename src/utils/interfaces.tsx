@@ -1,3 +1,9 @@
+export interface dbNamesType {
+    DATABASE : string;
+    ALL_RESERVATIONS : string;
+    NEW_RESERVATIONS : string;
+}
+
 export interface ReservationsType {
     confirmationNumber : number;
     firstName : string;
@@ -34,4 +40,8 @@ export interface ReservationAttributeNames {
     guestType : string;
     source : string;
     revenue : string; 
+}
+
+export interface ConfirmationNumberType {
+    confirmationNumber : number;
 }

@@ -1,17 +1,28 @@
 import { Date as ExcelDate, readSheet } from 'read-excel-file/browser'
 import { ReservationsType } from '../../utils/interfaces';
-import { reservationAttributeToRawNames as attrToRaw } from '../../utils/constants';
+import { reservationAttributeToRawNames as attrToRaw, dbNames } from '../../utils/constants';
 import Database from '../../utils/database';
+import { useContext } from 'react';
+import { DatabaseContext } from '../../utils/context';
 
 interface ProcessFileProps {
     selectedFile : any,
-    setData : any;
+    setTimestamp : any;
 }
 
-function ProcessFile({selectedFile, setData} : ProcessFileProps) {
+function ProcessFile({selectedFile, setTimestamp} : ProcessFileProps) {
+
+    const database = useContext(DatabaseContext).database!;
 
     async function onProcessFile(event : any) {
-		let arrayData = await readSheet(selectedFile);
+        let arrayData;
+        try {
+		    arrayData = await readSheet(selectedFile);
+        }
+        catch {
+            setTimestamp(Date.now());
+            return;
+        }
 
         // -------------------
         // --- Get Headers ---
@@ -109,15 +120,12 @@ function ProcessFile({selectedFile, setData} : ProcessFileProps) {
             data.push(rowObj);
         }
 
-        setData(data);
+        setTimestamp(Date.now());
 
         // -----------------------
         // --- Update Database ---
         // -----------------------
-
-        const db = new Database('rc-dashboard');
-        await db.createObjectStore_newReservations();
-        await db.putBulkValue_reservations('newReservations', data);
+        await database.current!.putBulkValue_newReservations(data);
 	};
 
     return (

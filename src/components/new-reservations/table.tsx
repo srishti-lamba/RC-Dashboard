@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ReservationsType } from "../../utils/interfaces";
-import {  reservationAttributeToDisplayNames as attrToDis } from "../../utils/constants";
+import {  reservationAttributeToDisplayNames as attrToDis, dbNames } from "../../utils/constants";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -12,14 +12,25 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Date as DateExcel } from "read-excel-file/browser";
 import MenuItem from "@mui/material/MenuItem";
 import { Box } from "@mui/material";
+import { DatabaseContext } from "../../utils/context";
 
 interface TableProps {
-    data : ReservationsType[];
+    timestamp : Date|undefined;
 }
 
-function Table({data} : TableProps) {
+function Table({timestamp} : TableProps) {
 
-    const table = useRef<MRT_TableInstance<ReservationsType>>(undefined)
+    const table = useRef<MRT_TableInstance<ReservationsType>>(undefined);
+    const [data, setData] = useState<ReservationsType[]>([]);
+    const database = useContext(DatabaseContext).database!;
+
+    useEffect(() => {
+        async function getData() {
+            let result = await database.current?.getAllValues_newReservations()
+            setData(result === undefined ? [] : result)
+        }
+        getData();
+    }, [timestamp])
 
     // ---------------
     // --- Columns ---

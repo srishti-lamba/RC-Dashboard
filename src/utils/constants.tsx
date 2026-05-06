@@ -1,4 +1,10 @@
-import { ReservationAttributeNames } from "./interfaces"
+import { dbNamesType, ReservationAttributeNames } from "./interfaces"
+
+export const dbNames : dbNamesType = {
+    DATABASE : "rc-dashboard",
+    ALL_RESERVATIONS : "allReservations",
+    NEW_RESERVATIONS : "newReservations",
+};
 
 export const reservationRawToDisplayNames : Record<string, string> = {
     "guestnum"   : "Confirmation Number", 
