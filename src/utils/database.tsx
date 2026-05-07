@@ -39,8 +39,16 @@ class Database {
     public async createObjectStore_allReservations() {
         try {
             this.db = await openDB(this.databaseName, undefined, {
-                upgrade(db: IDBPDatabase) {    
-                    let tableName = dbNames.ALL_RESERVATIONS
+                upgrade(db: IDBPDatabase) { 
+                    let tableName = ""
+                    
+                    tableName = dbNames.TIMESTAMPS
+                    if (!db.objectStoreNames.contains(tableName)) {
+                        const store = db.createObjectStore(tableName, { autoIncrement: false, keyPath: "tableName" });
+                        console.log(`${tableName} successfully created`)
+                    }
+                    
+                    tableName = dbNames.ALL_RESERVATIONS
                     if (!db.objectStoreNames.contains(tableName)) {
                         const store = db.createObjectStore(tableName, { autoIncrement: false, keyPath: "confirmationNumber" });
                         store.createIndex("confirmationNumberIndex", "confirmationNumber", { unique: true });  
@@ -74,6 +82,20 @@ class Database {
         return result;
     }
 
+    public async getTimestamp(tableName: string) {
+        try {
+            const tx = this.db.transaction(dbNames.TIMESTAMPS, 'readonly');
+            const store = tx.objectStore(dbNames.TIMESTAMPS);
+            const result = await store.get(tableName);
+            console.log('Get Data ', JSON.stringify(result));
+            return result;
+        }
+        catch(e) {
+            console.error(e)
+            return undefined;
+        }
+    }
+
     public async getAllValues(tableName: string) {
         let result = []
         try {
@@ -85,7 +107,7 @@ class Database {
             console.error(e)
             return result;
         }
-        console.log('Get All Data', JSON.stringify(result));
+        // console.log('Get All Data', JSON.stringify(result));
         return result;
     }
 
@@ -96,7 +118,8 @@ class Database {
             const store_new : IDBObjectStore = tx.objectStore(dbNames.NEW_RESERVATIONS);
             
             const data_new =  await store_new.getAll();
-            result = await this.getValuesFromKeys_allReservations(data_new as unknown as ConfirmationNumberType[]);
+            const keys : number[] = (data_new as unknown as ConfirmationNumberType[]).map(data => data.confirmationNumber)
+            result = await this.getValuesFromKeys_allReservations(keys);
         }
         catch(e) {
             console.error(e)
@@ -105,14 +128,14 @@ class Database {
         return result;
     }
 
-    public async getValuesFromKeys_allReservations(keys : ConfirmationNumberType[]) : Promise<ReservationsType[]> {
+    public async getValuesFromKeys_allReservations(keys : number[]) : Promise<ReservationsType[]> {
         let result : ReservationsType[] = []
         try {
             const tx : IDBTransaction = this.db.transaction(dbNames.ALL_RESERVATIONS, 'readwrite');
             const store_all : IDBObjectStore = tx.objectStore(dbNames.ALL_RESERVATIONS);
 
             let data_all = await Promise.allSettled(
-                keys.map(async num => store_all.get(num.confirmationNumber))
+                keys.map(async num => store_all.get(num))
             )
             data_all.forEach(data => { 
                 if (data.status === 'fulfilled') result.push(data.value as any)
@@ -150,6 +173,14 @@ class Database {
         const tx = this.db.transaction(tableName, 'readwrite');
         const store = tx.objectStore(tableName);
         const result = await store.put(value);
+        console.log('Put Data ', JSON.stringify(result));
+        return result;
+    }
+
+    public async putTimestamp(tableName: string, value: Number) {
+        const tx = this.db.transaction(dbNames.TIMESTAMPS, 'readwrite');
+        const store = tx.objectStore(dbNames.TIMESTAMPS);
+        const result = await store.put({tableName: tableName, timestamp: value});
         console.log('Put Data ', JSON.stringify(result));
         return result;
     }

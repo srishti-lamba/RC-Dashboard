@@ -2,6 +2,7 @@ import { dbNamesType, ReservationAttributeNames } from "./interfaces"
 
 export const dbNames : dbNamesType = {
     DATABASE : "rc-dashboard",
+    TIMESTAMPS : "timestamps",
     ALL_RESERVATIONS : "allReservations",
     NEW_RESERVATIONS : "newReservations",
 };

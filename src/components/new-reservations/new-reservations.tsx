@@ -4,6 +4,7 @@ import ProcessFile from "./process-file";
 import Table from "./table";
 import { ReservationsType } from "../../utils/interfaces";
 import { DatabaseContext } from "../../utils/context";
+import Timestamp from "./timestamp";
 
 function NewReservations() {
 
@@ -15,6 +16,7 @@ function NewReservations() {
             <h1>New Reservations</h1>
             <UploadFile setSelectedFile={setSelectedFile} />
             <ProcessFile selectedFile={selectedFile} setTimestamp={setTimestamp} />
+            <Timestamp ts={timestamp} />
             <Table timestamp={timestamp} />
         </div>
     )

@@ -120,12 +120,14 @@ function ProcessFile({selectedFile, setTimestamp} : ProcessFileProps) {
             data.push(rowObj);
         }
 
-        setTimestamp(Date.now());
+        let timestamp = Date.now();
+        setTimestamp(timestamp);
 
         // -----------------------
         // --- Update Database ---
         // -----------------------
         await database.current!.putBulkValue_newReservations(data);
+        await database.current!.putTimestamp(dbNames.NEW_RESERVATIONS, timestamp)
 	};
 
     return (

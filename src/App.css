@@ -41,6 +41,13 @@
     margin-bottom: 0.5em;
     padding: 0.5em 0;
   } /* h1 */
+
+  .timestamp {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-style: italic;
+    text-align: right;
+  }
 } /* .page */
 
 /* ------------- */
