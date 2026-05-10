@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import UploadFile from "./upload";
 import ProcessFile from "./process-file";
 import Table from "./table";
@@ -10,6 +10,12 @@ function NewReservations() {
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [timestamp, setTimestamp] = useState<Date|undefined>(undefined);
+    const dbSet : boolean = useContext(DatabaseContext).dbSet
+    
+    useEffect(() => {
+        if (dbSet === true)
+            setTimestamp(new Date())
+    }, [dbSet])
 
     return (
         <div className="page">

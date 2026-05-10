@@ -12,6 +12,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Date as DateExcel } from "read-excel-file/browser";
 import { DatabaseContext, Dictionary } from "../../utils/context";
 
+interface DuplicateDateBlockType {
+    confirmations : number[];
+    firstName ?: string;
+    lastName ?: string;
+    arrivals : Date[];
+    departures : Date[];
+    minArrival : Date;
+    maxDeparture : Date;
+}
+
 interface TableProps {
     timestamp : Date|undefined;
 }
@@ -55,24 +65,111 @@ function Table({timestamp} : TableProps) {
                 // If only has last name
             } )
 
+            const newBlock = (resCon : number, resArr : Date, resDep : Date) => {
+                return {
+                    confirmations : [resCon],
+                    arrivals: [resArr],
+                    departures: [resDep],
+                    minArrival: resArr,
+                    maxDeparture: resDep
+                } as DuplicateDateBlockType;
+            }
+
             Object.values(bothNames).forEach( (reservations : ReservationsType[]) => {
                 if (reservations.length == 1)
                     return
-                let allCon : number[] = reservations.map(r=>r.confirmationNumber)
-                let allArr : number[] = reservations.map(r=>r.arrivalDate.getUTCSeconds())
-                let allDep : number[] = reservations.map(r=>r.departureDate.getUTCSeconds())
 
-                let dup : DuplicateType = {
-                    confirmationNumber: allCon,
-                    reservations : reservations.length,
-                    firstName: reservations[0].firstName,
-                    lastName: reservations[0].lastName,
-                    arrivalDate: new Date(Math.min(...allArr)),
-                    departureDate: new Date(Math.max(...allDep))
+                let allCon : number[] = reservations.map(r=>r.confirmationNumber)
+                let blocks : DuplicateDateBlockType[] = []
+
+                for (let index = 0; index < reservations.length; index++) {
+                    let resCon : number = reservations[index].confirmationNumber;
+                    let resArr : Date = reservations[index].arrivalDate;
+                    let resDep : Date = reservations[index].departureDate;
+
+                    // Empty blocks, add
+                    if (blocks.length === 0) {
+                        blocks.push(newBlock(resCon, resArr, resDep))
+                        continue;
+                    }
+
+                    // Not empty, see how many it fits in
+                    let within : boolean[] = []
+                    let withinCount : number = 0
+                    for (let blockIndex = 0; blockIndex < blocks.length ; blockIndex++) {
+                        let block = blocks[blockIndex]
+                        within[blockIndex] = (
+                            // res   | ███ |
+                            // block | ███ |
+                            (resArr == block.minArrival || resDep == block.maxDeparture) ||
+                            // res   | ███   |
+                            // block |   ███ |
+                            (resDep >= block.minArrival && resDep <= block.maxDeparture) ||
+                            // res   |   ███ |
+                            // block | ███   |
+                            (resArr >= block.minArrival && resArr <= block.maxDeparture) ||
+                            // res   | █████ |
+                            // block |  ███  |
+                            (resArr <= block.minArrival && resDep >= block.maxDeparture) ||
+                            // res   |  ███  |
+                            // block | █████ |
+                            (resArr >= block.minArrival && resDep <= block.maxDeparture)
+                        )
+                        if (within[blockIndex] === true)
+                            withinCount += 1;
+                    }
+
+                    // Not within any, make new
+                    if (withinCount === 0) {
+                        blocks.push(newBlock(resCon, resArr, resDep));
+                        continue;
+                    }
+
+                    // Else, if only one overlap, add to that
+                    if (withinCount === 1) {
+                        let blockIndex = within.indexOf(true)
+                        let block = blocks[blockIndex]
+                        block.confirmations.push(resCon)
+                        block.arrivals.push(resArr)
+                        block.departures.push(resDep)
+                        block.minArrival = (block.minArrival <= resArr) ? block.minArrival : resArr
+                        block.maxDeparture = (block.maxDeparture >= resDep) ? block.maxDeparture : resDep
+                        continue;
+                    }
+
+                    // If multiple overlaps, merge
+                    let blockIndex = within.indexOf(true)
+                    let mergedBlock : DuplicateDateBlockType = newBlock(resCon, resArr, resDep)
+                    while (blockIndex !== -1) {
+                        let block = blocks[blockIndex]
+                        mergedBlock.confirmations.push(...block.confirmations)
+                        mergedBlock.arrivals.push(...block.arrivals)
+                        mergedBlock.departures.push(...block.departures)
+                        mergedBlock.minArrival = (mergedBlock.minArrival <= block.minArrival) ? mergedBlock.minArrival : block.minArrival
+                        mergedBlock.maxDeparture = (mergedBlock.maxDeparture >= block.maxDeparture) ? mergedBlock.maxDeparture : block.maxDeparture
+                        blockIndex = within.indexOf(true, blockIndex + 1)
+                    }
+
+                    let newBlocks : DuplicateDateBlockType[] = blocks.filter( (b, i) => within[i] === false)
+                    newBlocks.push(mergedBlock)
+
+                    blocks = newBlocks;
                 }
-                // console.log(reservations)
-                // console.log(dup)
-                newData.push(dup)
+
+                // Add to list
+                blocks.forEach( block => {
+                    let dup : DuplicateType = {
+                        confirmationNumber: allCon,
+                        reservations : block.arrivals.length,
+                        firstName: reservations[0].firstName,
+                        lastName: reservations[0].lastName,
+                        arrivalDate: block.minArrival,
+                        departureDate: block.maxDeparture
+                    }
+                    // console.log(reservations)
+                    // console.log(dup)
+                    newData.push(dup)
+                })
             } ) 
         
             setData(newData)

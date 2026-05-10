@@ -7,7 +7,8 @@ export interface Dictionary<T> {
 
 interface DatabaseType {
     database : React.RefObject<Database|undefined>|undefined;
+    dbSet : boolean;
 };
 
-export const DatabaseContext = createContext<DatabaseType>({ database : undefined });
+export const DatabaseContext = createContext<DatabaseType>({ database : undefined, dbSet : false });
 
